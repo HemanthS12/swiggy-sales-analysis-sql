@@ -1,5 +1,3 @@
-select top 10 * from swiggy_data;
-
 -- Data Validation and Cleaning
 
 -- Check for null values in each column
@@ -51,8 +49,8 @@ from swiggy_data
 )
 delete
 from cte where rn > 1;
-
--- Creating Schema:
+-------------------------------------------------------------------------------------------
+-- Creating Schema
 -- Dimension Tables
 -- DATE Table
 create table dim_date (
@@ -111,7 +109,7 @@ foreign key (restaurant_id) references dim_restaurant(restaurant_id),
 foreign key (category_id) references dim_category(category_id),
 foreign key (dish_id) references dim_dish(dish_id)
 );
-
+--------------------------------------------------------------------------------------
 -- Insert data in tables
 -- dim_date
 insert into dim_date (full_date, year, month, month_name, quarter, day, weeks)
@@ -170,7 +168,7 @@ on s.Category = c.category
 
 join dim_dish di
 on s.Dish_Name = di.dish_name;
-
+--------------------------------------------------------------------------------------
 -- Final Schema
 select * 
 from fact_swiggy_orders fso
@@ -184,7 +182,7 @@ join dim_category dc
 on dc.category_id = fso.category_id
 join dim_dish d
 on d.dish_id = fso.dish_id;
-
+--------------------------------------------------------------------------------------
 -- KPI's
 -- Total Orders
 select COUNT(*) as total_orders
@@ -194,14 +192,14 @@ from fact_swiggy_orders;
 select format(SUM(convert(float, price_inr)) / 1000000, 'N2') + ' INR Million' as total_revenue
 from fact_swiggy_orders; 
 
--- Average dish price
+-- Average Dish Price
 select format(AVG(convert(float, price_inr)), 'N2') + ' INR' as avg_dish_price
 from fact_swiggy_orders;
 
--- Average rating
+-- Average Rating
 select AVG(rating) as avg_rating
 from fact_swiggy_orders;
-
+--------------------------------------------------------------------------------------
 -- Deep-Dive Business Analysis
 
 -- Monthly Order trends
@@ -230,10 +228,10 @@ from fact_swiggy_orders f
 join dim_date d on f.date_id = d.date_id
 group by DATENAME(WEEKDAY, d.full_date), DATEPART(WEEKDAY, d.full_date)
 order by DATEPART(WEEKDAY, d.full_date);
-
+--------------------------------------------------------------------------------------
 -- Location Based Analysis
 
--- Top 10 cities by order volume
+-- Top 10 Cities by Order Volume
 select top 10 l.city, count(*) as total_orders
 from fact_swiggy_orders f
 join dim_location l on f.location_id = l.location_id
@@ -241,11 +239,11 @@ group by l.city
 order by total_orders desc;
 
 -- Revenue Contribution by States
-select l.state, SUM(f.price_inr) as total_revenue
+select l.state, format(SUM(convert(float, f.price_inr)), 'N2') + ' INR' as total_revenue
 from fact_swiggy_orders f
 join dim_location l on f.location_id = l.location_id
 group by l.state
-order by total_revenue desc;
+order by SUM(convert(float, f.price_inr)) desc;
 
 -- Total Order Contribution by States
 select l.state, COUNT(*) as total_orders
@@ -253,7 +251,7 @@ from fact_swiggy_orders f
 join dim_location l on f.location_id = l.location_id
 group by l.state
 order by total_orders desc;
-
+--------------------------------------------------------------------------------------
 -- Food Performance
 
 -- Top 10 Restaurants by Orders
@@ -283,7 +281,7 @@ from fact_swiggy_orders f
 join dim_category c on f.category_id = c.category_id
 group by c.category
 order by total_orders desc; 
-
+--------------------------------------------------------------------------------------
 -- Customer Spending Insights
 
 -- Total Orders by Price Range (Under 100, 100–199, 200–299, 300–499, 500+)
@@ -308,7 +306,7 @@ else
 '500+'
 end
 order by total_orders desc;
-
+--------------------------------------------------------------------------------------
 -- Ratings Analysis
 
 -- Rating Count Distribution (1 - 5)
