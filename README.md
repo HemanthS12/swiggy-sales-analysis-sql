@@ -192,7 +192,8 @@ The star-schema–based analytics pipeline enabled clean, structured insights in
 
 <h2><a id="author--contact"></a>Author & Contact</h2>
 
-**Hemanth S** 
+**Hemanth S**
 Data Analyst
+
 📧 [Email] (hemanths8181@gmail.com)
 🔗 [LinkedIn] (https://www.linkedin.com/in/hemanth-s13/)
